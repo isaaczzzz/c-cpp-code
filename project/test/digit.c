@@ -26,21 +26,26 @@ void print_dights_array(void);
 
 int main(void)
 {
+    int time_seg[15];
     unsigned char numbers[MAX_DIGHTS];
-    int ch, i = 0, j;
+    int ch, i, j, num, year;
     time_t timep;
     struct tm *p;
     
     while(1) {
         time(&timep);
         p = gmtime(&timep);
+        i = 0;
         clear_dight_array();
         
-        w
-        
-                process_dights_array(ch - '0', i++);
+        year = p -> tm_year + 1900;
+        for(j = 1000; j; j /= 10){
+            printf("%d", year / j);
+            process_dights_array(year / j, i++);
+            year %= j;
+        }               
         print_dights_array();
-    
+        Sleep(2000);
     }
     system("pause");
     return 0;
