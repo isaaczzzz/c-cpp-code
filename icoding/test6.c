@@ -146,60 +146,233 @@ void init_list(GoodsList **L)
 
 bool insert_item(GoodsList *L, GoodsInfo goodsInfo, int choice)
 {
-    Goodlist *tmp;
-    GoodList *prev = L;
-    GoodList *p = L->next;
+    GoodsList *cur, *new_node;
+    new_node = (GoodsList *)malloc(sizeof(GoodsList));
 
-    if (CurrentCnt >= MAX_DISCOUNT_LEN)
-    {
-        printf("数据库已满\n");
+    if (new_node == NULL)
         return false;
-    }
-
+    new_node->data = goodsInfo;
+    new_node->next = NULL;
+    cur = L->next;
+    int i = 2;
     switch (choice)
     {
     case 0: //尾插
-        while (p != NULL)
+        if (cur == NULL)
         {
-            prev = p;
-            p = p->next;
+            L->next = new_node;
+            CurrentCnt++;
+            break;
         }
-        tmp = (GoodsList *)malloc(sizeof(GoodsList));
-        tmp->data = goodsInfo;
-        prev->next = tmp;
-        tmp->next = NULL;
+        else
+            while (cur->next)
+                cur = cur->next;
+        cur->next = new_node;
         CurrentCnt++;
-        return true;
         break;
     case 1: //头插
-        tmp = (GoodsList *)malloc(sizeof(GoodsList));
-        tmp->data = goodsInfo;
-        tmp->next = p->next;
-        L->next = tmp;
-        CurrentCnt++;
-        return true;
-        break;
-    default:
-        if (choice <= CurrentCnt + 1 && choice > 0)
+        if (cur == NULL)
         {
-            for (int i = 1; i < choice; i++)
-            {
-                prev = p;
-                p = p->next;
-            }
-            tmp = (GoodsList *)malloc(sizeof(GoodsList));
-            tmp->data = goodsInfo;
-            prev->next = tmp;
-            tmp->next = p;
+            L->next = new_node;
             CurrentCnt++;
-            return true;
         }
         else
         {
-            printf("输入的位置超出当前商品列表范围\n");
-            return false;
+            new_node->next = L->next;
+            L->next = new_node;
+            CurrentCnt++;
         }
-
+        break;
+    default:
+        while (cur)
+        {
+            if (i == choice)
+            {
+                new_node->next = cur->next;
+                cur->next = new_node;
+                CurrentCnt++;
+                return true;
+            }
+            cur = cur->next;
+            i++;
+        }
+        return false;
         break;
     }
+    return true;
+}
+
+bool delete_item(GoodsList *L, char *goods_id)
+{
+    GoodsList *cur = L, *nxt = L->next;
+    while (nxt != NULL && (strcmp(nxt->data.goods_id, goods_id)))
+    {
+        cur = nxt;
+        nxt = nxt->next;
+    }
+    if (nxt == NULL)
+    {
+        return false;
+    }
+    else
+    {
+        cur->next = nxt->next;
+        free(nxt);
+        CurrentCnt--;
+        return true;
+    }
+}
+
+GoodsList *search_item(GoodsList *L, char *goods_id)
+{
+    GoodsList *p;
+    p = L->next;
+    if (strcmp(L->data.goods_id, goods_id) == 0)
+        return L;
+    while (p != NULL)
+    {
+        if (strcmp(p->data.goods_id, goods_id) == 0)
+            return p;
+        p = p->next;
+    }
+    printf("Cannot be found.\n");
+    return NULL;
+}
+
+bool change_item(GoodsList *L, char *goods_id, GoodsInfo new_info)
+{
+    GoodsList *p;
+    p = L;
+    p = search_item(p, goods_id);
+    if (p == NULL)
+    {
+        return false;
+    }
+    if (strcmp(p->data.goods_id, goods_id) == 0)
+    {
+        p->data = new_info;
+        return true;
+    }
+}
+
+void output_one_item(GoodsList *p)
+{
+    if (p == NULL)
+        return;
+    printf("商品ID:%s \n", p->data.goods_id);
+    printf("商品名称:%s \n", p->data.goods_name);
+    printf("商品价格:%d  \n", p->data.goods_price);
+    printf("商品折扣:%s \n", p->data.goods_discount);
+    printf("商品数量:%d \n", p->data.goods_amount);
+    printf("商品剩余数量:%d\n ", p->data.goods_remain);
+}
+
+void output_all_items(GoodsList *L)
+{
+    GoodsList *p;
+    p = L->next;
+    if (p == NULL)
+    {
+        printf("NULL\n");
+        return;
+    }
+    while (p != NULL)
+    {
+        output_one_item(p);
+        p = p->next;
+    }
+    return;
+}
+
+void destory_list(GoodsList **L)
+{
+    GoodsList *p;
+    while (*L)
+    {
+        p = *L;
+        *L = (*L)->next;
+        free(p);
+    }
+    *L = NULL;
+    CurrentCnt = 0;
+}
+
+void destory_list_and_file(GoodsList **L)
+{
+    destory_list(L);
+    remove("GOODS_FILE_NAME");
+}
+
+int save_to_file(GoodsList *L)
+{
+    GoodsList *p;
+    p = L->next;
+    int i = 0;
+
+    if (L->next == NULL)
+        exit(0);
+    FILE *fp = fopen("GOODS_FILE_NAME", "w+");
+    if (fp == NULL)
+        exit(0);
+    while (p)
+    {
+        GoodsInfo gi = p->data;
+        fprintf(fp, "%s %s %d %s %d %d\n", gi.goods_id, gi.goods_name, gi.goods_price, gi.goods_discount, gi.goods_amount, gi.goods_remain);
+        p = p->next;
+        i++;
+    }
+    fclose(fp);
+    return i;
+}
+
+void bubble_sort(GoodsList *L)
+{
+    GoodsList *p;
+    p = L;
+    int n, h, j;
+    n = 0;
+
+    if (!p)
+        return;
+
+    while (p)
+    {
+        n++;
+        p = p->next;
+    }
+    if (n == 1)
+        return;
+    for (j = 0; j < n - 1; j++)
+    {
+        p = L;
+        for (h = 0; h < n - 1 - j; h++)
+        {
+            if (p->data.goods_price > p->next->data.goods_price)
+            {
+                GoodsInfo tmp;
+                tmp = p->next->data;
+                p->next->data = p->data;
+                p->data = tmp;
+            }
+            p = p->next;
+        }
+    }
+}
+
+GoodsInfo read_goods_info()
+{
+    GoodsInfo t;
+    printf("商品ID:");
+    read_line(t.goods_id, MAX_ID_LEN);
+    printf("商品名:");
+    read_line(t.goods_name, MAX_NAME_LEN);
+    printf("商品价格:");
+    scanf("%d", &t.goods_price);
+    printf("商品折扣:");
+    read_line(t.goods_discount, MAX_DISCOUNT_LEN);
+    printf("商品数量:");
+    scanf("%d", &t.goods_amount);
+    printf("商品剩余数量:");
+    scanf("%d", &t.goods_remain);
+    return t;
 }
