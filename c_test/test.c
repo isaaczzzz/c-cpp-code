@@ -1,29 +1,70 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-void average(int (*p)[100], int m, const int n)
+#define SIZE 25
+
+struct film
 {
-    int i, j, sum = 0;
-    for (i = 0; i < m; i++)
+    char title[SIZE];
+    int rating;
+    struct film *next;
+};
+
+char *readLine(char *st, int n);
+void outputList(struct film *list);
+
+int main(void)
+{
+    struct film *head = NULL;
+    struct film *prev, *cur;
+    char input[SIZE];
+
+    puts("First movie title:");
+    while (readLine(input, SIZE) != NULL && input[0] != '\0')
     {
-        for (j = 0; j < n; j++)
-        {
-            if (i == 0 || i == m - 1)
-                sum += *(*(p + i) + j);
-            else if (j == 0 || j == n - 1)
-                sum += *(*(p + i) + j);
-        }
+        cur = (struct film *)malloc(sizeof(struct film));
+        if (head == NULL)
+            head = cur;
+        else
+            prev->next = cur;
+        cur->next = NULL;
+        strcpy(cur->title, input);
+        puts("rating <1-10>");
+        scanf("%d", &cur->rating);
+        while (getchar() != '\n')
+            continue;
+        puts("next movie title (empty line to stop):");
+        prev = cur;
     }
-    printf("%.2f", (float)sum / 10);
+    outputList(head);
+    return 0;
 }
 
-int main()
+void outputList(struct film *list)
 {
-    int m, n, i, j, a[100][100] = {0};
-    printf("请输入一个m*n的矩阵\n");
-    scanf("%d%d", &m, &n);
-    for (i = 0; i < m; i++)
-        for (j = 0; j < n; j++)
-            scanf("%d", &a[i][j]);
-    average(a, m, n);
-    return 0;
+    if (list == NULL)
+        puts("No data");
+    else
+        puts("Here is the list:");
+    for (; list != NULL; list = list->next)
+        printf("Movie: %s  Rating %d\n", list->title, list->rating);
+}
+
+char *readLine(char *st, int n)
+{
+    char *retVal;
+    char *find;
+
+    retVal = fgets(st, n, stdin);
+    if (retVal)
+    {
+        find = strchr(st, '\n'); //查找换行符
+        if (find)
+            *find = '\0';
+        else
+            while (getchar() != '\n')
+                continue;
+    }
+    return retVal;
 }
