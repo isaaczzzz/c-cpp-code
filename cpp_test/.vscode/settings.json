@@ -2,6 +2,10 @@
     "code-runner.runInTerminal": true,
     "code-runner.ignoreSelection": true,
     "files.associations": {
-        "iostream": "cpp"
-    }
+        "iostream": "cpp",
+        "cstddef": "cpp",
+        "new": "cpp",
+        "ostream": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }
