@@ -416,5 +416,5 @@ void translate(int len,char* list){
 			}	 
 		}
 	}
-    system("pause"); 
+    system("pause");
 }
