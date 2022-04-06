@@ -12,13 +12,15 @@ typedef struct node
 } LinkStackNode;
 typedef LinkStackNode *LinkStack;
 
+//LinkStackNode *s <==> LinkStack s
+
 void initStack(LinkStack *s) 
 {
     *s = (LinkStack)malloc(sizeof(LinkStackNode));
     (*s)->next = NULL;
 }
 
-void destroyStack(LinkStackNode *s)
+void destroyStack(LinkStack s)
 {
     LinkStackNode *p = s, *q = s->next;
     while(q != NULL) {
@@ -29,7 +31,7 @@ void destroyStack(LinkStackNode *s)
     free(p);
 }
 
-int isEmpty(LinkStackNode *s) 
+int isEmpty(LinkStack s) 
 {
     return (s->next == NULL);
 }
@@ -70,17 +72,21 @@ int getTop(ElementType *e, LinkStack s)
 
 void test1()
 {
-    LinkStack *s;
+    LinkStack s;
     ElementType e;
     initStack(&s);
-    push(1, s);
-    push(2, s);
+    push(10, s);
+    push(20, s);
+    printf("%d ", isEmpty(s));
+
     getTop(&e, s);
     printf("%d ", e);
     pop(&e, s);
     printf("%d ", e);
     pop(&e, s);
     printf("%d ", e);
+
+    printf("%d ", isEmpty(s));
 }
 
 int main(void)
