@@ -10,7 +10,7 @@ typedef struct node
     ElementType data;
     struct node *next;
 } LinkStackNode;
-typedef LinkStackNode *LinkStack;
+typedef LinkStackNode* LinkStack;
 
 //LinkStackNode *s <==> LinkStack s
 
