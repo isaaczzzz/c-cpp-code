@@ -30,7 +30,6 @@ void shellSort(RecType R[], int n)
             }
             R[j + d] = tmp;
         }
-        d /= 2;
+        d /= 2; // 增量减小
     }
 }
-
